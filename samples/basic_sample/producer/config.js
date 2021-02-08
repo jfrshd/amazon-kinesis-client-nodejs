@@ -7,12 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 
 var config = module.exports = {
   kinesis : {
-    region : 'us-east-1'
+    region : 'eu-west-1'
   },
 
   sampleProducer : {
-    stream : 'kclnodejssample',
-    shards : 2,
+    stream : 'testing-kinesis-cdk',
+    shards : 1,
     waitBetweenDescribeCallsInSeconds : 5
   }
 };

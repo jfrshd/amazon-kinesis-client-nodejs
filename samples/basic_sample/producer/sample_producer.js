@@ -81,17 +81,18 @@ function sampleProducer(kinesis, config) {
 
   return {
     run: function() {
-      _createStreamIfNotCreated(function(err) {
-        if (err) {
-          log.error(util.format('Error creating stream: %s', err));
-          return;
-        }
-        var count = 0;
-        while (count < 10) {
-          setTimeout(_writeToKinesis, 1000);
-          count++;
-        }
-      });
+      // _createStreamIfNotCreated(function(err) {
+      //   if (err) {
+      //     log.error(util.format('Error creating stream: %s', err));
+      //     return;
+      //   }
+       
+      // });
+      var count = 0;
+      while (count < 10) {
+        setTimeout(_writeToKinesis, 1000);
+        count++;
+      }
     }
   };
 }
