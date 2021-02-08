@@ -1,7 +1,7 @@
 /coverage
 /doc
 /lib/jars
-/node_modules
+node_modules
 *.log
 .idea
 package-lock.json
