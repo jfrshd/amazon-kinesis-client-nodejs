@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+  <head> </head>
+
+  <body>
+    <script
+      src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
+      type="text/javascript"
+    ></script>
+
+    <script type="text/javascript">
+      $(function () {
+        // if user is running mozilla then use it's built-in WebSocket
+        window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+        var connection = new WebSocket("ws://127.0.0.1:1337");
+
+        connection.onopen = function () {
+          console.log("socket opened successfully");
+        };
+
+        connection.onerror = function (error) {
+          console.log("error", error);
+        };
+
+        connection.onmessage = function (message) {
+          try {
+            var json = JSON.parse(message.data);
+            console.log(json);
+          } catch (e) {
+            console.log("This doesn't look like a valid JSON: ", message.data);
+            return;
+          }
+          // handle incoming message
+        };
+      });
+    </script>
+  </body>
+</html>
