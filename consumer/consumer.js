@@ -42,7 +42,7 @@ function recordProcessor() {
         //     partitionKey
         //   )
         // );
-        log.info(util.format(JSON.parse(data)));
+        log.info(util.format(data));
 
         // connection.send(data);
       }

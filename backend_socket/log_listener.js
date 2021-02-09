@@ -1,10 +1,7 @@
 var WebSocketClient = require("websocket").client;
 
 var spawn = require("child_process").spawn;
-var tail = spawn("tail", [
-  "-f",
-  "../consumer/application.log",
-]);
+var tail = spawn("tail", ["-f", "../consumer/application.log"]);
 
 var client = new WebSocketClient();
 
@@ -23,11 +20,11 @@ client.on("connect", function (connection) {
   });
 
   tail.stdout.on("data", (data) => {
-    const tmp = data.toString();
-    if (tmp !== undefined) {
-      console.log(JSON.stringify(tmp));
-      connection.send(JSON.stringify(tmp));
-    } else console.log("undefined");
+    // const tmp = data.toString();
+    // if (tmp !== undefined) {
+    //   console.log(JSON.stringify(tmp));
+    connection.send(data.toString().trim());
+    // } else console.log("undefined");
   });
 });
 
