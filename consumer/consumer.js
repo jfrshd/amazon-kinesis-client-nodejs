@@ -1,7 +1,9 @@
 var kcl = require("aws-kcl");
 var logger = require("./logger");
 var util = require("util");
+const AWS = require("aws-sdk");
 
+const cloudwatchlogs = new AWS.CloudWatchLogs({ region: "eu-west-1" });
 function recordProcessor() {
   var log = logger().getLogger("recordProcessor");
   var shardId;
@@ -28,24 +30,69 @@ function recordProcessor() {
 
       var records = processRecordsInput.records;
       var record, data, sequenceNumber, partitionKey;
-      for (var i = 0; i < records.length; ++i) {
-        record = records[i];
-        data = new Buffer(record.data, "base64").toString();
-        sequenceNumber = record.sequenceNumber;
-        partitionKey = record.partitionKey;
-        // log.info(
-        //   util.format(
-        //     "ShardID: %s, Record: %s, SeqenceNumber: %s, PartitionKey:%s",
-        //     shardId,
-        //     data,
-        //     sequenceNumber,
-        //     partitionKey
-        //   )
-        // );
-        log.info(util.format(data));
 
-        // connection.send(data);
-      }
+      // console.log(
+      //   JSON.parse(Buffer.from(records[0].data, "base64").toString())
+      // );
+      // completeCallback();
+      // return;
+      cloudwatchlogs.describeLogStreams(
+        {
+          logGroupName: "kcl",
+        },
+        (err, data) => {
+          if (err) {
+            console.log(err);
+            return;
+          }
+
+          var params = {
+            logEvents: records.map((record, index) => {
+              record = JSON.parse(
+                Buffer.from(record.data, "base64").toString()
+              );
+              // console.log(record);
+              return {
+                message: JSON.stringify({
+                  sub: record.eventBody.sub,
+                  uuid: record.eventBody.uuid,
+                  // date_created: record.eventBody.date_created,
+                  date_created: Date.now(),
+                }),
+                timestamp: Date.now(),
+              };
+            }),
+            logGroupName: "kcl",
+            logStreamName: "kcl",
+            sequenceToken: data.logStreams[0].uploadSequenceToken,
+          };
+          cloudwatchlogs.putLogEvents(params, function (err, data) {
+            if (err) console.log("cloudwatch", err, err.stack);
+            else {
+              // console.log("cloudwatch", data);
+            }
+          });
+        }
+      );
+
+      // for (var i = 0; i < records.length; ++i) {
+      //   record = records[i];
+      //   data = Buffer.from(record.data, "base64").toString();
+      //   sequenceNumber = record.sequenceNumber;
+      //   partitionKey = record.partitionKey;
+      //   // log.info(
+      //   //   util.format(
+      //   //     "ShardID: %s, Record: %s, SeqenceNumber: %s, PartitionKey:%s",
+      //   //     shardId,
+      //   //     data,
+      //   //     sequenceNumber,
+      //   //     partitionKey
+      //   //   )
+      //   // );
+      //   log.info(util.format(data));
+
+      //   // connection.send(data);
+      // }
       if (!sequenceNumber) {
         completeCallback();
         return;
@@ -82,3 +129,15 @@ function recordProcessor() {
   };
 }
 kcl(recordProcessor()).run();
+
+// 1612957577714509503
+
+// 1612957578865498005
+
+// 1612957586083952700
+
+// 1612957586126003627
+
+// (1612957586126003627 - 1612957577714509503) / 1000000000
+
+// (1612957586083952700 - 1612957578865498005 )/ 1000000000
